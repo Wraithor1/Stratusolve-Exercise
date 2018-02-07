@@ -75,6 +75,7 @@
     $('#myModal').on('show.bs.modal', function (event) {
         var triggerElement = $(event.relatedTarget); // Element that triggered the modal
         var modal = $(this);
+        $('#TaskId').remove();
         if (triggerElement.attr("id") == 'newTask') {
             modal.find('.modal-title').text('New Task');
             $('#deleteTask').hide();
@@ -84,19 +85,36 @@
             $('#deleteTask').show();
             currentTaskId = triggerElement.attr("id");
             console.log('Task ID: '+triggerElement.attr("id"));
+            $('#InputTaskName').val(triggerElement.find('h4').text() )
+            $('#InputTaskDescription').val( triggerElement.find('p').text() )
         }
+        $('#myModal').find('form').append("<div id='TaskId'><input type='hidden' id='InputTaskId' value='" + currentTaskId + "'</div>");
     });
     $('#saveTask').click(function() {
         //Assignment: Implement this functionality
-        alert('Save... Id:'+currentTaskId);
-        $('#myModal').modal('hide');
-        updateTaskList();
+        //alert('Save... Id:'+currentTaskId);
+        $.post(
+            'update_task.php',
+            "taskId=" + $('#InputTaskId').val() + "&taskName=" + $('#InputTaskName').val() + "&taskDescription=" + $('#InputTaskDescription').val(),
+            function(data) {
+                $('#myModal').modal('hide');
+                updateTaskList();
+            }
+        ).done(function( data ) { console.log( data )} );
+        
+        
     });
     $('#deleteTask').click(function() {
         //Assignment: Implement this functionality
-        alert('Delete... Id:'+currentTaskId);
-        $('#myModal').modal('hide');
-        updateTaskList();
+        //alert('Delete... Id:'+currentTaskId);
+        $.post(
+            'update_task.php',
+            "deleteTask=true&taskId=" + $('#InputTaskId').val() + "&taskName=" + $('#InputTaskName').val() + "&taskDescription=" + $('#InputTaskDescription').val(),
+            function(data) {
+                $('#myModal').modal('hide');
+                updateTaskList();
+            }
+        ).done(function( data ) { console.log( data )} );
     });
     function updateTaskList() {
         $.post("list_tasks.php", function( data ) {
